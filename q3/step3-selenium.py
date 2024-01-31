@@ -32,7 +32,7 @@ Enc_State_Repr = {
 
 def visit_url(dest: str):
     http_reached = False    # http address reachable?
-    redirect = False        # http->https redirect? <valid IFF http_access>
+    redirect = False        # http->https redirect? <ignore value unless http_reached>
     http_accessible = False # http address accessible? 
     http_code = -1
     
@@ -81,7 +81,7 @@ def visit_url(dest: str):
         https_accessible = False
         driver.quit()
     
-    state = None
+    state = ""
     # print(http_accessible, https_accessible)
     match (http_accessible, https_accessible):
         case (True, True):
