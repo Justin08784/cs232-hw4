@@ -37,6 +37,9 @@ customheaders = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36", 
 }
 
+customheaders2 = {
+    "User-Agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+}
 
 def visit_url(dest: str):
     http_reached = False    # http address reachable?
@@ -47,7 +50,7 @@ def visit_url(dest: str):
     https_accessible = False # https address accessible? 
     
     try:
-        http_r = requests.get("http://" + dest, timeout=5, headers=customheaders)
+        http_r = requests.get("http://" + dest, timeout=5, headers=customheaders2)
         http_reached = True
         
         scheme = urlparse(http_r.url).scheme
@@ -67,7 +70,7 @@ def visit_url(dest: str):
     http_accessible = http_reached and not redirect
     
     try:
-        https_r = requests.get("https://" + dest, timeout=5, headers=customheaders)
+        https_r = requests.get("https://" + dest, timeout=5, headers=customheaders2)
         https_accessible = True
     except:
         https_accessible = False
