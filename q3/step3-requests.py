@@ -115,7 +115,7 @@ def process_df(df: pd.DataFrame, dest_path: str):
     
 if __name__ == "__main__":
     topsites = pd.read_csv(repo_root + "/q0/step0-topsites.csv", header=None)
-    process_df(df=topsites, dest_path="Zstep3-topsites-requests.csv")
+    process_df(df=topsites, dest_path="step3-topsites-requests.csv")
     
     othersites = pd.read_csv(repo_root + "/q0/step0-othersites.csv", header=None)
-    process_df(df=othersites[:10], dest_path="Zstep3-othersites-requests.csv")
+    process_df(df=othersites[:10], dest_path="step3-othersites-requests.csv")

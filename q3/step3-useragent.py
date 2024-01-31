@@ -36,20 +36,25 @@ customheaders = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36", 
 }
 
+
+def code_success(code: int):
+    return 200 <= code and code <= 299
+
 def visit_url(dest: str):
-    http_reached = False    # http address reachable?
-    redirect = False        # http->https redirect? <valid IFF http_access>
-    http_accessible = False # http address accessible? 
+    http_reached = False
+    http_success = False        # http address reachable AND return code is a success?
+    redirect = False            # http->https redirect? <valid IFF http_access>
     http_code = ""
-    
-    https_accessible = False # https address accessible? 
+    http_accessible = False     # http address accessible? 
     
     try:
-        http_r = requests.get("http://" + dest, timeout=5, headers=customheaders)
+        http_r = requests.get("http://" + dest, timeout=5)
         http_reached = True
         
         scheme = urlparse(http_r.url).scheme
         http_code = http_r.status_code
+        
+        http_success = code_success(http_code)
         match scheme:
             case "http":
                 redirect = False
@@ -62,13 +67,24 @@ def visit_url(dest: str):
     except:
         http_reached = False
     
-    http_accessible = http_reached and not redirect
+    http_accessible = http_reached and http_success and not redirect
+    
+    
+    https_reached = False
+    https_success = False       # https address reachable AND return code is a success?
+    https_code = ""
+    https_accessible = False    # https address accessible? 
     
     try:
-        https_r = requests.get("https://" + dest, timeout=5, headers=customheaders)
-        https_accessible = True
+        https_r = requests.get("https://" + dest, timeout=5)
+        https_reached = True
+        https_code = https_r.status_code
+        
+        https_success = code_success(https_code)
     except:
-        https_accessible = False
+        https_reached = False
+    
+    https_accessible = https_reached and https_success
     
     state = None
     match (http_accessible, https_accessible):
@@ -81,6 +97,10 @@ def visit_url(dest: str):
         case (False, False):
             state = "neither"
     
+    # print(f"url: {dest}")
+    # print(f">> (reached: {http_reached}, success: {http_success} <code: {http_code}>, redirect: {redirect}, access: {http_accessible})")
+    # print(f">> (reached: {https_reached}, success: {https_success} <code: {https_code}>, access: {https_accessible})")
+    # print(f">> state: {state}, http_code: {http_code}")
     return state, http_code
 
 
