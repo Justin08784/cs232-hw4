@@ -34,7 +34,7 @@ def visit_url(dest: str):
     http_reached = False    # http address reachable?
     redirect = False        # http->https redirect? <ignore value unless http_reached>
     http_accessible = False # http address accessible? 
-    http_code = -1
+    http_code = ""
     
     https_accessible = False # https address accessible? 
     # print("dest", dest)
