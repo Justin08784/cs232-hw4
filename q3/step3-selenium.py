@@ -100,8 +100,8 @@ def process_df(df: pd.DataFrame, dest_path: str):
     num_rows = df.shape[0]
     
     states = []
-    # for url in tqdm(df["url"]):
-    for url in df["url"]:
+    for url in tqdm(df["url"]):
+    # for url in df["url"]:
         state = visit_url(url)
         states.append(state)
     df["state"] = states
