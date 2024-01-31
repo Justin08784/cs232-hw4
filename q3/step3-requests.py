@@ -25,21 +25,25 @@ Enc_State_Repr = {
     Encryption_State.neither : "neither"
 }
 
+def code_success(code: int):
+    return 200 <= code and code <= 299
 
 def visit_url(dest: str):
-    http_reached = False    # http address reachable?
-    redirect = False        # http->https redirect? <valid IFF http_access>
-    http_accessible = False # http address accessible? 
+    http_success = False        # http address reachable AND return code is a success?
+    redirect = False            # http->https redirect? <valid IFF http_access>
     http_code = ""
+    http_accessible = False     # http address accessible? 
     
-    https_accessible = False # https address accessible? 
+    https_success = False       # https address reachable AND return code is a success?
+    https_accessible = False    # https address accessible? 
     
     try:
         http_r = requests.get("http://" + dest, timeout=5)
-        http_reached = True
         
         scheme = urlparse(http_r.url).scheme
         http_code = http_r.status_code
+        
+        http_success = code_success(http_code)
         match scheme:
             case "http":
                 redirect = False
@@ -50,15 +54,19 @@ def visit_url(dest: str):
                 exit(-1)
         
     except:
-        http_reached = False
+        http_success = False
     
-    http_accessible = http_reached and not redirect
+    http_accessible = http_success and not redirect
     
     try:
         https_r = requests.get("https://" + dest, timeout=5)
-        https_accessible = True
+        https_code = https_r.status_code
+        
+        https_success = code_success(https_code)
     except:
-        https_accessible = False
+        https_success = False
+    
+    https_accessible = https_success
     
     state = None
     match (http_accessible, https_accessible):
@@ -97,7 +105,7 @@ def process_df(df: pd.DataFrame, dest_path: str):
     
 if __name__ == "__main__":
     topsites = pd.read_csv(repo_root + "/q0/step0-topsites.csv", header=None)
-    process_df(df=topsites, dest_path="step3-topsites-requests.csv")
+    process_df(df=topsites[:10], dest_path="Zstep3-topsites-requests.csv")
     
     othersites = pd.read_csv(repo_root + "/q0/step0-othersites.csv", header=None)
-    process_df(df=othersites, dest_path="step3-othersites-requests.csv")
+    process_df(df=othersites[:10], dest_path="Zstep3-othersites-requests.csv")
