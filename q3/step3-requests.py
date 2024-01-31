@@ -6,6 +6,10 @@ import pandas as pd
 import numpy as np
 
 from tqdm import tqdm
+import os
+
+
+repo_root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 
 class Encryption_State(Enum):
@@ -34,7 +38,7 @@ customheaders = {
 }
 
 
-def determine_encrypt_state(dest: str):
+def visit_url(dest: str):
     http_reached = False    # http address reachable?
     redirect = False        # http->https redirect? <valid IFF http_access>
     http_accessible = False # http address accessible? 
@@ -43,17 +47,15 @@ def determine_encrypt_state(dest: str):
     https_accessible = False # https address accessible? 
     
     try:
-        http_r = requests.get("http://" + dest, timeout=1)
+        http_r = requests.get("http://" + dest, timeout=5)
         http_reached = True
         
         scheme = urlparse(http_r.url).scheme
         http_code = http_r.status_code
         match scheme:
             case "http":
-                # print("no redirect")
                 redirect = False
             case "https":
-                # print("yes redirect")
                 redirect = True
             case _:
                 print(f"Unknown scheme: {scheme}")
@@ -65,7 +67,7 @@ def determine_encrypt_state(dest: str):
     http_accessible = http_reached and not redirect
     
     try:
-        https_r = requests.get("https://" + dest, timeout=1)
+        https_r = requests.get("https://" + dest, timeout=5)
         https_accessible = True
     except:
         https_accessible = False
@@ -73,13 +75,13 @@ def determine_encrypt_state(dest: str):
     state = None
     match (http_accessible, https_accessible):
         case (True, True):
-            state = Enc_State_Repr[Encryption_State.both]
+            state = "both"
         case (True, False):
-            state = Enc_State_Repr[Encryption_State.HTTPonly]
+            state = "HTTPonly"
         case (False, True):
-            state = Enc_State_Repr[Encryption_State.HTTPSonly]
+            state = "HTTPSonly"
         case (False, False):
-            state = Enc_State_Repr[Encryption_State.neither]
+            state = "neither"
     
     return state, http_code
 
@@ -91,7 +93,7 @@ def process_df(df: pd.DataFrame, dest_path: str):
     states = []
     codes = []
     for url in tqdm(df["url"]):
-        state, http_code = determine_encrypt_state(url)
+        state, http_code = visit_url(url)
         states.append(state)
         codes.append(http_code)
     df["state"] = states
@@ -106,22 +108,8 @@ def process_df(df: pd.DataFrame, dest_path: str):
 
     
 if __name__ == "__main__":
-    # print(determine_encrypt_state("netflix.net"))
-    # exit()
-    
-    topsites = pd.read_csv("/Users/shinej/cs/cs232/hw4/q0/step0-topsites.csv", header=None)
+    topsites = pd.read_csv(repo_root + "/q0/step0-topsites.csv", header=None)
     process_df(df=topsites, dest_path="step3-topsites-requests.csv")
     
-    othersites = pd.read_csv("/Users/shinej/cs/cs232/hw4/q0/step0-othersites.csv", header=None)
+    othersites = pd.read_csv(repo_root + "/q0/step0-othersites.csv", header=None)
     process_df(df=othersites, dest_path="step3-othersites-requests.csv")
-        
-
-    exit()
-    
-    print(determine_encrypt_state("chicagoreader.com"))
-    print("\n")
-    print(determine_encrypt_state("washington.edu"))
-    print("\n")
-    print(determine_encrypt_state("uchicago.edu"))
-    print("\n")
-    print(determine_encrypt_state("itturnsoutgrantdoesnotlikehotdogs.fyi"))
