@@ -89,7 +89,7 @@ def visit_url(dest: str):
     # print(f">> (reached: {http_reached}, success: {http_success} <code: {http_code}>, redirect: {redirect}, access: {http_accessible})")
     # print(f">> (reached: {https_reached}, success: {https_success} <code: {https_code}>, access: {https_accessible})")
     # print(f">> state: {state}, http_code: {http_code}")
-    return state, http_code
+    return state, https_code
 
 
 def process_df(df: pd.DataFrame, dest_path: str):
@@ -99,9 +99,9 @@ def process_df(df: pd.DataFrame, dest_path: str):
     states = []
     codes = []
     for url in tqdm(df["url"]):
-        state, http_code = visit_url(url)
+        state, https_code = visit_url(url)
         states.append(state)
-        codes.append(http_code)
+        codes.append(https_code)
     df["state"] = states
     df["code"] = codes
     
