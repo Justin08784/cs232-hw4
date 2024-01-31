@@ -32,13 +32,8 @@ customheaders = {
     "Accept-Encoding": "gzip, deflate", 
     "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8", 
     "Dnt": "0", 
-    "Host": "uchicago.org", 
     "Upgrade-Insecure-Requests": "1", 
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36", 
-}
-
-customheaders2 = {
-    "User-Agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
 }
 
 def visit_url(dest: str):
@@ -50,7 +45,7 @@ def visit_url(dest: str):
     https_accessible = False # https address accessible? 
     
     try:
-        http_r = requests.get("http://" + dest, timeout=5, headers=customheaders2)
+        http_r = requests.get("http://" + dest, timeout=5, headers=customheaders)
         http_reached = True
         
         scheme = urlparse(http_r.url).scheme
@@ -70,7 +65,7 @@ def visit_url(dest: str):
     http_accessible = http_reached and not redirect
     
     try:
-        https_r = requests.get("https://" + dest, timeout=5, headers=customheaders2)
+        https_r = requests.get("https://" + dest, timeout=5, headers=customheaders)
         https_accessible = True
     except:
         https_accessible = False
