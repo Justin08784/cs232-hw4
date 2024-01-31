@@ -40,10 +40,11 @@ def visit_url(dest: str):
     # print("dest", dest)
     
     
-    display = Display(visible=0, size=(800, 600))
-    display.start()
+    # display = Display(visible=0, size=(800, 600))
+    # display.start()
     driver = webdriver.Chrome()
-    driver.set_page_load_timeout(5)
+    driver.set_page_load_timeout(1)
+    driver.set_script_timeout(1)
     
     try:
         driver.get("http://" + dest)
@@ -69,7 +70,8 @@ def visit_url(dest: str):
     http_accessible = http_reached and not redirect
     
     driver = webdriver.Chrome()
-    driver.set_page_load_timeout(5)
+    driver.set_page_load_timeout(1)
+    driver.set_script_timeout(1)
     
     try:
         driver.get("https://" + dest)
@@ -115,6 +117,11 @@ def process_df(df: pd.DataFrame, dest_path: str):
 
     
 if __name__ == "__main__":
+    display = Display(visible=0, size=(800, 600))
+    display.start()
+    # visit_url("www.google.com")
+    # exit()
+    
     topsites = pd.read_csv(repo_root + "/q0/step0-topsites.csv", header=None)
     process_df(df=topsites, dest_path="step3-topsites-selenium.csv")
     
