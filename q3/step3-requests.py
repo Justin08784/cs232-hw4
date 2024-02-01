@@ -89,7 +89,11 @@ def visit_url(dest: str):
     # print(f">> (reached: {http_reached}, success: {http_success} <code: {http_code}>, redirect: {redirect}, access: {http_accessible})")
     # print(f">> (reached: {https_reached}, success: {https_success} <code: {https_code}>, access: {https_accessible})")
     # print(f">> state: {state}, http_code: {http_code}")
-    return state, https_code
+    rv_code = http_code
+    if https_code != "":
+        rv_code = https_code
+
+    return state, rv_code
 
 
 def process_df(df: pd.DataFrame, dest_path: str):
