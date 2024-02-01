@@ -118,8 +118,9 @@ def process_df(df: pd.DataFrame, dest_path: str):
     
     # with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
     #     print(df)
-        
-    df.to_csv(dest_path, index=False, header=False)
+    
+    # write only df subset with a valid issuer
+    df.loc[df["issuer"] != ""].to_csv(dest_path, index=False, header=False)
 
 
 if __name__ == "__main__":
@@ -133,11 +134,11 @@ if __name__ == "__main__":
     # exit()
     
     topsites = pd.read_csv(repo_root + "/q0/step0-topsites.csv", header=None)
-    process_df(topsites, dest_path="LATESTstep4-topsites.csv")
+    process_df(topsites, dest_path="2LATESTstep4-topsites.csv")
     # topsites.columns = ["index", "url"]
     
     othersites = pd.read_csv(repo_root + "/q0/step0-othersites.csv", header=None)
-    process_df(othersites, dest_path="LATESTstep4-othersites.csv")
+    process_df(othersites, dest_path="2LATESTstep4-othersites.csv")
     
     # i=0
     # for url in topsites["url"][:1]:
