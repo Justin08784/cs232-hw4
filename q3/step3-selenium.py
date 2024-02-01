@@ -10,6 +10,7 @@ import os
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 from pyvirtualdisplay import Display
 
 import time
@@ -43,8 +44,8 @@ def visit_url(dest: str):
     
     # display = Display(visible=0, size=(800, 600))
     # display.start()
-    # driver = webdriver.Chrome()
-    # driver.set_page_load_timeout(1)
+    driver = webdriver.Chrome()
+    driver.set_page_load_timeout(5)
     
     try:
         driver.get("http://" + dest)
@@ -61,25 +62,32 @@ def visit_url(dest: str):
                 print(f"Unknown scheme: {scheme}")
                 exit(-1)
         
-        # driver.quit()
         
+    except TimeoutException:
+        http_reached = False
     except:
         http_reached = False
-        # driver.quit()
+        pass
+    finally:
+        driver.quit()
     
     http_accessible = http_reached and not redirect
     
-    # driver = webdriver.Chrome()
-    # driver.set_page_load_timeout(5)
-    time.sleep(1)
+    time.sleep(0.5)
+    
+    driver = webdriver.Chrome()
+    driver.set_page_load_timeout(5)
     
     try:
-        # driver.get("https://" + dest)
+        driver.get("https://" + dest)
         https_accessible = True
-        # driver.quit()
+    except TimeoutException:
+        https_accessible = False
     except:
         https_accessible = False
-        # driver.quit()
+        pass
+    finally:
+        driver.quit()
     
     state = ""
     # print(http_accessible, https_accessible)
@@ -102,10 +110,13 @@ def process_df(df: pd.DataFrame, dest_path: str):
     num_rows = df.shape[0]
     
     states = []
-    for url in tqdm(df["url"]):
-    # for url in df["url"]:
+    # for url in tqdm(df["url"]):
+    i = 0
+    for url in df["url"]:
         state = visit_url(url)
         states.append(state)
+        i += 1
+        print(f"{i}, url: {url}, state: {state}")
     df["state"] = states
     
     df.to_csv(dest_path, index=False, header=False)
@@ -114,15 +125,10 @@ def process_df(df: pd.DataFrame, dest_path: str):
     
     
     
-driver = None
-    
 if __name__ == "__main__":
     display = Display(visible=0, size=(800, 600))
     display.start()
 
-
-    driver = webdriver.Chrome()
-    driver.set_page_load_timeout(5)
     
     topsites = pd.read_csv(repo_root + "/q0/step0-topsites.csv", header=None)
     process_df(df=topsites, dest_path="LATESTstep3-topsites-selenium.csv")
