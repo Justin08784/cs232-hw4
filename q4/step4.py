@@ -133,11 +133,11 @@ if __name__ == "__main__":
     # exit()
     
     topsites = pd.read_csv(repo_root + "/q0/step0-topsites.csv", header=None)
-    process_df(topsites, dest_path="step4-topsites.csv")
+    process_df(topsites, dest_path="LATESTstep4-topsites.csv")
     # topsites.columns = ["index", "url"]
     
     othersites = pd.read_csv(repo_root + "/q0/step0-othersites.csv", header=None)
-    process_df(othersites, dest_path="step4-othersites.csv")
+    process_df(othersites, dest_path="LATESTstep4-othersites.csv")
     
     # i=0
     # for url in topsites["url"][:1]:
