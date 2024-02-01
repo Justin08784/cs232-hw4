@@ -12,6 +12,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from pyvirtualdisplay import Display
 
+import time
 
 repo_root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
@@ -43,7 +44,7 @@ def visit_url(dest: str):
     # display = Display(visible=0, size=(800, 600))
     # display.start()
     # driver = webdriver.Chrome()
-    # driver.set_page_load_timeout(5)
+    # driver.set_page_load_timeout(1)
     
     try:
         driver.get("http://" + dest)
@@ -70,6 +71,7 @@ def visit_url(dest: str):
     
     # driver = webdriver.Chrome()
     # driver.set_page_load_timeout(5)
+    time.sleep(1)
     
     try:
         # driver.get("https://" + dest)
@@ -77,7 +79,7 @@ def visit_url(dest: str):
         # driver.quit()
     except:
         https_accessible = False
-        driver.quit()
+        # driver.quit()
     
     state = ""
     # print(http_accessible, https_accessible)
@@ -127,5 +129,3 @@ if __name__ == "__main__":
     
     othersites = pd.read_csv(repo_root + "/q0/step0-othersites.csv", header=None)
     process_df(df=othersites, dest_path="LATESTstep3-othersites-selenium.csv")
-    
-    driver.quit()
