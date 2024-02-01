@@ -32,6 +32,14 @@ Enc_State_Repr = {
 }
 
 
+def kill_zombies():
+    os.system("rm -rf /tmp/.com.google.Chrome.*")
+    os.system("rm -rf /tmp/.org.chromium.Chromium.*")
+    os.system("pkill chrome")
+    os.system("pkill Xvfb")
+
+
+
 def visit_url(dest: str):
     http_reached = False    # http address reachable?
     redirect = False        # http->https redirect? <ignore value unless http_reached>
@@ -41,6 +49,7 @@ def visit_url(dest: str):
     https_accessible = False # https address accessible? 
     # print("dest", dest)
     
+    # time.sleep(2)
     
     # display = Display(visible=0, size=(800, 600))
     # display.start()
@@ -73,7 +82,7 @@ def visit_url(dest: str):
     
     http_accessible = http_reached and not redirect
     
-    time.sleep(0.5)
+    # time.sleep(2)
     
     driver = webdriver.Chrome()
     driver.set_page_load_timeout(5)
@@ -110,13 +119,23 @@ def process_df(df: pd.DataFrame, dest_path: str):
     num_rows = df.shape[0]
     
     states = []
-    # for url in tqdm(df["url"]):
-    i = 0
-    for url in df["url"]:
+    df["state"] = ""
+    
+    f = open(dest_path, "a")
+    
+    for index, row in tqdm(df.iterrows()):
+        url = row["url"]
+        
         state = visit_url(url)
+        # df.loc[index, "state"] = state
+        print(f"{index+1}, url: {url}, state: {state}")
         states.append(state)
-        i += 1
-        print(f"{i}, url: {url}, state: {state}")
+        addendum = ",".join([str(row["index"]), row["url"], state]) + "\n"
+        f.write(addendum)
+            
+    f.close()
+    
+    return
     df["state"] = states
     
     df.to_csv(dest_path, index=False, header=False)
@@ -126,12 +145,17 @@ def process_df(df: pd.DataFrame, dest_path: str):
     
     
 if __name__ == "__main__":
+    kill_zombies()
+    
     display = Display(visible=0, size=(800, 600))
     display.start()
 
     
     topsites = pd.read_csv(repo_root + "/q0/step0-topsites.csv", header=None)
-    process_df(df=topsites, dest_path="LATESTstep3-topsites-selenium.csv")
+    process_df(df=topsites[445:], dest_path="2LATESTstep3-topsites-selenium.csv")
+    # I had to manually fill in row 446 (speedtest.net), 885 (biblegateway.com), 994 (split.io)
+    # second run: row 446 (speedtest.net), 571,merriam-webster.com
     
     othersites = pd.read_csv(repo_root + "/q0/step0-othersites.csv", header=None)
-    process_df(df=othersites, dest_path="LATESTstep3-othersites-selenium.csv")
+    process_df(df=othersites, dest_path="2LATESTstep3-othersites-selenium.csv")
+    # othersites ran without problem
