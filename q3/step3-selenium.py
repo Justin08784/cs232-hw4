@@ -58,47 +58,49 @@ class Crawler():
         
         https_accessible = False # https address accessible? 
         
-        time.sleep(0.5)
+        time.sleep(1.5)
         try:
-            print("  trying " + dest)
+            print("  1trying")
             self.driver.get("http://" + dest)
-            print("  try_succ " + dest)
+            print("  1try_succ")
             http_reached = True
             
-            print("  parsing " + dest)
+            print("  1parsing")
             scheme = urlparse(self.driver.current_url).scheme
-            print("  parse_succ " + dest)
+            print("  1parse_succ")
             # print(f"dest: {dest}, currurl: {self.driver.current_url}, urlparse: {urlparse(self.driver.current_url)}")
             
-            print("  matching" + dest)
+            print("  1matching")
             match scheme:
                 case "http":
-                    print("  match 1" + dest)
+                    print("  1match 1")
                     redirect = False
                 case "https":
-                    print("  match 2" + dest)
+                    print("  1match 2")
                     redirect = True
                 case _:
-                    print("  match 3 (default)" + dest)
-                    print(f"Unknown scheme: {scheme}")
-                    exit(-1)
+                    print("  1match 3 (default)")
+                    raise ValueError(f"Unknown scheme: {scheme}")
         except:
-            print("  error " + dest)
+            print("  1error")
             http_reached = False
             pass
         
         http_accessible = http_reached and not redirect
         
         
-        time.sleep(0.5)
+        time.sleep(1.5)
         try:
+            print("  2trying")
             self.driver.get("https://" + dest)
+            print("  2try_succ")
             https_accessible = True
         except:
+            print("  2error")
             https_accessible = False
             pass
         
-        
+        print("  final")
         state = ""
         match (http_accessible, https_accessible):
             case (True, True):
@@ -126,10 +128,10 @@ class Crawler():
         for index, row in df.iterrows():
             url = row["url"]
             
-            print(f"{index+1}, url: {url}", end="", flush=True)
+            print(f"{index+1}, url: {url}", flush=True)
             state = self.visit_url(url)
             states.append(state)
-            print(f", state: {state}", flush=True)
+            print(f"->state: {state}", flush=True)
             addendum = ",".join([str(row["index"]), row["url"], state]) + "\n"
             f.write(addendum)
                 
