@@ -42,9 +42,8 @@ def visit_url(dest: str):
     
     # display = Display(visible=0, size=(800, 600))
     # display.start()
-    driver = webdriver.Chrome()
-    driver.set_page_load_timeout(1)
-    driver.set_script_timeout(1)
+    # driver = webdriver.Chrome()
+    # driver.set_page_load_timeout(5)
     
     try:
         driver.get("http://" + dest)
@@ -61,22 +60,21 @@ def visit_url(dest: str):
                 print(f"Unknown scheme: {scheme}")
                 exit(-1)
         
-        driver.quit()
+        # driver.quit()
         
     except:
         http_reached = False
-        driver.quit()
+        # driver.quit()
     
     http_accessible = http_reached and not redirect
     
-    driver = webdriver.Chrome()
-    driver.set_page_load_timeout(1)
-    driver.set_script_timeout(1)
+    # driver = webdriver.Chrome()
+    # driver.set_page_load_timeout(5)
     
     try:
-        driver.get("https://" + dest)
+        # driver.get("https://" + dest)
         https_accessible = True
-        driver.quit()
+        # driver.quit()
     except:
         https_accessible = False
         driver.quit()
@@ -114,16 +112,20 @@ def process_df(df: pd.DataFrame, dest_path: str):
     
     
     
-
+driver = None
     
 if __name__ == "__main__":
     display = Display(visible=0, size=(800, 600))
     display.start()
-    # visit_url("www.google.com")
-    # exit()
+
+
+    driver = webdriver.Chrome()
+    driver.set_page_load_timeout(5)
     
     topsites = pd.read_csv(repo_root + "/q0/step0-topsites.csv", header=None)
-    process_df(df=topsites, dest_path="step3-topsites-selenium.csv")
+    process_df(df=topsites, dest_path="LATESTstep3-topsites-selenium.csv")
     
     othersites = pd.read_csv(repo_root + "/q0/step0-othersites.csv", header=None)
-    process_df(df=othersites, dest_path="step3-othersites-selenium.csv")
+    process_df(df=othersites, dest_path="LATESTstep3-othersites-selenium.csv")
+    
+    driver.quit()
