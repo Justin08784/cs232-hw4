@@ -62,9 +62,9 @@ def visit_url(dest: str):
                 print(f"Unknown scheme: {scheme}")
                 exit(-1)
         
-        
-    except TimeoutException:
-        http_reached = False
+
+    # except TimeoutException:
+    #     http_reached = False
     except:
         http_reached = False
         pass
@@ -81,8 +81,8 @@ def visit_url(dest: str):
     try:
         driver.get("https://" + dest)
         https_accessible = True
-    except TimeoutException:
-        https_accessible = False
+    # except TimeoutException:
+    #     https_accessible = False
     except:
         https_accessible = False
         pass
