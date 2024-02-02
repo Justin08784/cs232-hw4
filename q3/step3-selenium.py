@@ -104,10 +104,6 @@ class Crawler():
 
     def process_df(self, df: pd.DataFrame, dest_path: str):
         df.columns = ["index", "url"]
-        num_rows = df.shape[0]
-        
-        states = []
-        df["state"] = ""
         
         f = open(dest_path, "a")
         
@@ -116,21 +112,15 @@ class Crawler():
             
             print(f"{index+1}, url: {url}", flush=True)
             state = self.visit_url(url)
-            states.append(state)
             print(f"->state: {state}", flush=True)
             addendum = ",".join([str(row["index"]), row["url"], state]) + "\n"
             f.write(addendum)
                 
         f.close()
-        
-        return
-        df["state"] = states
-        
-        df.to_csv(dest_path, index=False, header=False)
 
     def run(self):
         topsites = pd.read_csv(repo_root + "/q0/step0-topsites.csv", header=None)
-        self.process_df(df=topsites[440:].copy(), dest_path="step3-topsites-selenium.csv")
+        self.process_df(df=topsites.copy(), dest_path="step3-topsites-selenium.csv")
         
         othersites = pd.read_csv(repo_root + "/q0/step0-othersites.csv", header=None)
         self.process_df(df=othersites.copy(), dest_path="step3-othersites-selenium.csv")
