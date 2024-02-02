@@ -32,29 +32,29 @@ customheaders = {
     "Accept-Encoding": "gzip, deflate", 
     "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8", 
     "Dnt": "0", 
-    "Host": "uchicago.org", 
     "Upgrade-Insecure-Requests": "1", 
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36", 
 }
 
-customheaders2 = {
-    "User-Agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
-}
+
+def code_success(code: int):
+    return 200 <= code and code <= 299
 
 def visit_url(dest: str):
-    http_reached = False    # http address reachable?
-    redirect = False        # http->https redirect? <valid IFF http_access>
-    http_accessible = False # http address accessible? 
-    http_code = -1
-    
-    https_accessible = False # https address accessible? 
+    http_reached = False
+    http_success = False        # http address reachable AND return code is a success?
+    redirect = False            # http->https redirect? <valid IFF http_access>
+    http_code = ""
+    http_accessible = False     # http address accessible? 
     
     try:
-        http_r = requests.get("http://" + dest, timeout=5, headers=customheaders2)
+        http_r = requests.get("http://" + dest, timeout=5)
         http_reached = True
         
         scheme = urlparse(http_r.url).scheme
         http_code = http_r.status_code
+        
+        http_success = code_success(http_code)
         match scheme:
             case "http":
                 redirect = False
@@ -67,13 +67,24 @@ def visit_url(dest: str):
     except:
         http_reached = False
     
-    http_accessible = http_reached and not redirect
+    http_accessible = http_reached and http_success and not redirect
+    
+    
+    https_reached = False
+    https_success = False       # https address reachable AND return code is a success?
+    https_code = ""
+    https_accessible = False    # https address accessible? 
     
     try:
-        https_r = requests.get("https://" + dest, timeout=5, headers=customheaders2)
-        https_accessible = True
+        https_r = requests.get("https://" + dest, timeout=5)
+        https_reached = True
+        https_code = https_r.status_code
+        
+        https_success = code_success(https_code)
     except:
-        https_accessible = False
+        https_reached = False
+    
+    https_accessible = https_reached and https_success
     
     state = None
     match (http_accessible, https_accessible):
@@ -86,7 +97,16 @@ def visit_url(dest: str):
         case (False, False):
             state = "neither"
     
-    return state, http_code
+    # print(f"url: {dest}")
+    # print(f">> (reached: {http_reached}, success: {http_success} <code: {http_code}>, redirect: {redirect}, access: {http_accessible})")
+    # print(f">> (reached: {https_reached}, success: {https_success} <code: {https_code}>, access: {https_accessible})")
+    # print(f">> state: {state}, http_code: {http_code}")
+    
+    rv_code = http_code
+    if https_code != "":
+        rv_code = https_code
+
+    return state, rv_code
 
 
 def process_df(df: pd.DataFrame, dest_path: str):
@@ -96,9 +116,9 @@ def process_df(df: pd.DataFrame, dest_path: str):
     states = []
     codes = []
     for url in tqdm(df["url"]):
-        state, http_code = visit_url(url)
+        state, https_code = visit_url(url)
         states.append(state)
-        codes.append(http_code)
+        codes.append(https_code)
     df["state"] = states
     df["code"] = codes
     
@@ -112,7 +132,7 @@ def process_df(df: pd.DataFrame, dest_path: str):
     
 if __name__ == "__main__":
     topsites = pd.read_csv(repo_root + "/q0/step0-topsites.csv", header=None)
-    process_df(df=topsites, dest_path="step3-topsites-useragent.csv")
+    process_df(df=topsites, dest_path="LATESTstep3-topsites-useragent.csv")
     
     othersites = pd.read_csv(repo_root + "/q0/step0-othersites.csv", header=None)
-    process_df(df=othersites, dest_path="step3-othersites-useragent.csv")
+    process_df(df=othersites, dest_path="LATESTstep3-othersites-useragent.csv")
