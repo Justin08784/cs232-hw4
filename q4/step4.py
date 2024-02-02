@@ -113,38 +113,16 @@ def process_df(df: pd.DataFrame, dest_path: str):
         new_cols["sign_algo"].append(rv.sign_algo)
     
     for colname in new_cols.keys():
-        # df[colname] = new_cols[colname]
         df.loc[:, colname] = new_cols[colname]
     
-    # with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
-    #     print(df)
     
     # write only df subset with a valid issuer
     df.loc[df["issuer"] != ""].to_csv(dest_path, index=False, header=False)
 
 
 if __name__ == "__main__":
-    # df1=pd.read_csv("step4-topsites.csv", header=None)
-    # print(df1)
-    
-    # df2=pd.read_csv("step4-othersites.csv", header=None)
-    # print(df2)
-    
-    
-    # exit()
-    
     topsites = pd.read_csv(repo_root + "/q0/step0-topsites.csv", header=None)
-    process_df(topsites, dest_path="2LATESTstep4-topsites.csv")
-    # topsites.columns = ["index", "url"]
+    process_df(topsites, dest_path="step4-topsites.csv")
     
     othersites = pd.read_csv(repo_root + "/q0/step0-othersites.csv", header=None)
-    process_df(othersites, dest_path="2LATESTstep4-othersites.csv")
-    
-    # i=0
-    # for url in topsites["url"][:1]:
-    # # for url in tqdm(topsites["url"]):
-    #     rv = visit_url(url)
-    #     # print(f"{i}: {rv}")
-    #     i+=1
-        
-    # # visit_url("bingbadaboom.tyf")
+    process_df(othersites, dest_path="step4-othersites.csv")

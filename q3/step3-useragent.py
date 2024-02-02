@@ -48,7 +48,7 @@ def visit_url(dest: str):
     http_accessible = False     # http address accessible? 
     
     try:
-        http_r = requests.get("http://" + dest, timeout=5)
+        http_r = requests.get("http://" + dest, headers=customheaders, timeout=5)
         http_reached = True
         
         scheme = urlparse(http_r.url).scheme
@@ -76,7 +76,7 @@ def visit_url(dest: str):
     https_accessible = False    # https address accessible? 
     
     try:
-        https_r = requests.get("https://" + dest, timeout=5)
+        https_r = requests.get("https://" + dest, headers=customheaders, timeout=5)
         https_reached = True
         https_code = https_r.status_code
         
@@ -97,10 +97,6 @@ def visit_url(dest: str):
         case (False, False):
             state = "neither"
     
-    # print(f"url: {dest}")
-    # print(f">> (reached: {http_reached}, success: {http_success} <code: {http_code}>, redirect: {redirect}, access: {http_accessible})")
-    # print(f">> (reached: {https_reached}, success: {https_success} <code: {https_code}>, access: {https_accessible})")
-    # print(f">> state: {state}, http_code: {http_code}")
     
     rv_code = http_code
     if https_code != "":
@@ -132,7 +128,7 @@ def process_df(df: pd.DataFrame, dest_path: str):
     
 if __name__ == "__main__":
     topsites = pd.read_csv(repo_root + "/q0/step0-topsites.csv", header=None)
-    process_df(df=topsites, dest_path="LATESTstep3-topsites-useragent.csv")
+    process_df(df=topsites, dest_path="step3-topsites-useragent.csv")
     
     othersites = pd.read_csv(repo_root + "/q0/step0-othersites.csv", header=None)
-    process_df(df=othersites, dest_path="LATESTstep3-othersites-useragent.csv")
+    process_df(df=othersites, dest_path="step3-othersites-useragent.csv")

@@ -60,29 +60,19 @@ class Crawler():
         
         time.sleep(1.5)
         try:
-            print("  1trying")
             self.driver.get("http://" + dest)
-            print("  1try_succ")
             http_reached = True
             
-            print("  1parsing")
             scheme = urlparse(self.driver.current_url).scheme
-            print("  1parse_succ")
-            # print(f"dest: {dest}, currurl: {self.driver.current_url}, urlparse: {urlparse(self.driver.current_url)}")
             
-            print("  1matching")
             match scheme:
                 case "http":
-                    print("  1match 1")
                     redirect = False
                 case "https":
-                    print("  1match 2")
                     redirect = True
                 case _:
-                    print("  1match 3 (default)")
                     raise ValueError(f"Unknown scheme: {scheme}")
         except:
-            print("  1error")
             http_reached = False
             pass
         
@@ -91,16 +81,12 @@ class Crawler():
         
         time.sleep(1.5)
         try:
-            print("  2trying")
             self.driver.get("https://" + dest)
-            print("  2try_succ")
             https_accessible = True
         except:
-            print("  2error")
             https_accessible = False
             pass
         
-        print("  final")
         state = ""
         match (http_accessible, https_accessible):
             case (True, True):
@@ -144,13 +130,10 @@ class Crawler():
 
     def run(self):
         topsites = pd.read_csv(repo_root + "/q0/step0-topsites.csv", header=None)
-        self.process_df(df=topsites[440:].copy(), dest_path="3LATESTstep3-topsites-selenium.csv")
-        # I had to manually fill in row 446 (speedtest.net), 885 (biblegateway.com), 994 (split.io)
-        # second run: row 446 (speedtest.net), 571,merriam-webster.com
+        self.process_df(df=topsites[440:].copy(), dest_path="step3-topsites-selenium.csv")
         
         othersites = pd.read_csv(repo_root + "/q0/step0-othersites.csv", header=None)
-        self.process_df(df=othersites.copy(), dest_path="3LATESTstep3-othersites-selenium.csv")
-        # othersites ran without problem
+        self.process_df(df=othersites.copy(), dest_path="step3-othersites-selenium.csv")
         
         self.driver.quit()
         
