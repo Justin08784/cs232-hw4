@@ -33,6 +33,10 @@ Enc_State_Repr = {
 
 
 def kill_zombies():
+    '''
+    Kill any residual processes and free up memory associated with any previous
+    iterations of this program.
+    '''
     all_cmds = "rm -rf /tmp/.com.google.Chrome.*; rm -rf /tmp/.org.chromium.Chromium.*; pkill chrome; pkill Xvfb"
     
     os.system("rm -rf /tmp/.com.google.Chrome.*")
@@ -52,11 +56,11 @@ class Crawler():
 
     def visit_url(self, dest: str):
         http_reached = False    # http address reachable?
-        redirect = False        # http->https redirect? <ignore value unless http_reached>
-        http_accessible = False # http address accessible? 
+        redirect = False        # does http->https redirect occur? <ignore value unless http_reached>
+        http_accessible = False # is http address accessible? 
         http_code = ""
         
-        https_accessible = False # https address accessible? 
+        https_accessible = False # is https address accessible? 
         
         time.sleep(1.5)
         try:
@@ -103,6 +107,11 @@ class Crawler():
 
 
     def process_df(self, df: pd.DataFrame, dest_path: str):
+        '''
+        Add "state" and "code" columns to given dataframe of urls, and
+        append-write (one line at a time) to dest_path.
+        '''
+        
         df.columns = ["index", "url"]
         
         f = open(dest_path, "a")

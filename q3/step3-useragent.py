@@ -38,12 +38,17 @@ customheaders = {
 
 
 def code_success(code: int):
+    ''' Does the http(s) code indicate success? '''
     return 200 <= code and code <= 299
 
 def visit_url(dest: str):
-    http_reached = False
-    http_success = False        # http address reachable AND return code is a success?
-    redirect = False            # http->https redirect? <valid IFF http_access>
+    '''
+    Return 1) state (information about which of http and https url variants are accessible)
+    and 2) https_status code of given url, dest.
+    '''
+    http_reached = False        # did we get a response (incl. code)?
+    http_success = False        # does the code indicate success?
+    redirect = False            # does a http->https redirect occur?
     http_code = ""
     http_accessible = False     # http address accessible? 
     
@@ -70,7 +75,7 @@ def visit_url(dest: str):
     http_accessible = http_reached and http_success and not redirect
     
     
-    https_reached = False
+    https_reached = False       # did we get a response (incl. code)?
     https_success = False       # https address reachable AND return code is a success?
     https_code = ""
     https_accessible = False    # https address accessible? 
@@ -97,7 +102,7 @@ def visit_url(dest: str):
         case (False, False):
             state = "neither"
     
-    
+    # use https_code whenever available; http_code otherwise
     rv_code = http_code
     if https_code != "":
         rv_code = https_code
@@ -106,6 +111,11 @@ def visit_url(dest: str):
 
 
 def process_df(df: pd.DataFrame, dest_path: str):
+    '''
+    Add "state" and "code" columns to given dataframe of urls, and
+    write to dest_path.
+    '''
+    
     df.columns = ["index", "url"]
     num_rows = df.shape[0]
     

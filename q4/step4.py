@@ -20,6 +20,10 @@ algo_repr = {
 ReturnStruct = namedtuple("ReturnStruct", "issuer period crypto_algo key_len rsa_exp sign_algo")
 
 def visit_url(dest: str):
+    '''
+    Visit given url, dest, and return the desired cert information in the form
+    of a "ReturnStruct" namedtuple.
+    '''
     pd.options.mode.chained_assignment = None  # default='warn'
     
     website = dest
@@ -29,16 +33,12 @@ def visit_url(dest: str):
     conn_success = False
     try:
         connection = socket.create_connection((website, 443), timeout=5)
-        # connection = socket.create_connection((website, 443), timeout=0.5)
     except:
-        # print(f"1fail {dest}")
         return null_rv
     
     try:
-        # print("my conn:", connection)
         s = ctx.wrap_socket(connection, server_hostname=website)
     except:
-        # print(f"2fail {dest}")
         return null_rv
         
     try:
@@ -69,7 +69,6 @@ def visit_url(dest: str):
     key_len = pkey.bits()
     # print(f"Q15 Key Len: {key_len}\n")
     
-    # pprint(vars(pkey))
     pub_nums = pkey.to_cryptography_key().public_numbers()
     rsa_exp = ""
     match pkey.type():
@@ -91,6 +90,12 @@ def visit_url(dest: str):
     
 
 def process_df(df: pd.DataFrame, dest_path: str):
+    '''
+    Add columns corresponding to requested cert information in the given 
+    dataframe of urls, and write to dest_path.
+    '''
+    
+    
     df.columns = ["index", "url"]
     num_rows = df.shape[0]
     
